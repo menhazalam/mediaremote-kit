@@ -20,9 +20,6 @@ let package = Package(
             dependencies: [],
             resources: [
                 .copy("Resources")
-            ],
-            linkerSettings: [
-                .unsafeFlags(["-Xlinker", "-no_warn_duplicate_libraries"])
             ]
         ),
         .testTarget(
