@@ -184,6 +184,10 @@ final class MediaRemoteAdapterProcess {
                   type == "data",
                   let payload = json["payload"] as? [String: Any]
             else {
+                // Log non-data messages for debugging
+                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    logger.debug("MediaRemoteAdapter: received non-data message: \(json)")
+                }
                 return
             }
             
@@ -203,7 +207,9 @@ final class MediaRemoteAdapterProcess {
             updateHandler?(update)
             
         } catch {
-            logger.debug("MediaRemoteAdapter: JSON parse error: \(error)")
+            // Log the problematic line for debugging
+            let preview = line.prefix(100)
+            logger.debug("MediaRemoteAdapter: JSON parse error for line: '\(preview)...' - \(error)")
         }
     }
     

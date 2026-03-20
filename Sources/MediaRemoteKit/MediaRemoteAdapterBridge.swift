@@ -88,8 +88,7 @@ final class MediaRemoteAdapterBridge: ObservableObject {
     
     func playerNames(completion: @escaping ([String]) -> Void) {
         guard let state = currentState,
-              let bundleID = state.bundleIdentifier,
-              state.playing || state.title != nil
+              let bundleID = state.bundleIdentifier
         else {
             completion([])
             return
