@@ -131,6 +131,20 @@ public enum NowPlaying {
     public static func setRepeat(_ mode: RepeatMode, forPlayer playerName: String) {
         MediaRemoteAdapterBridge.shared.setRepeat(mode, forPlayer: playerName)
     }
+    
+    // MARK: - System Volume
+    
+    /// Returns the macOS system output volume (0–100).
+    /// - Returns: Volume level from 0 to 100
+    public static func systemVolume() -> Int {
+        return SystemVolume.shared.getVolume()
+    }
+    
+    /// Sets the macOS system output volume (0–100).
+    /// - Parameter volume: Volume level from 0 to 100
+    public static func setSystemVolume(_ volume: Int) {
+        SystemVolume.shared.setVolume(volume)
+    }
 }
 
 // MARK: - Notification Names

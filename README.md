@@ -59,6 +59,10 @@ if let fileURL = artwork.fileUrl {
     let image = NSImage(contentsOf: fileURL)
 }
 
+// System volume control
+let currentVolume = NowPlaying.systemVolume()
+NowPlaying.setSystemVolume(75)
+
 // Stop observing when done
 NowPlaying.stopObserving()
 ```
