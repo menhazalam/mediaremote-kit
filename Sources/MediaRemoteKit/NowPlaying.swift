@@ -102,6 +102,7 @@ public enum NowPlaying {
     ///   - command: The command to send (play, pause, next, etc.)
     ///   - playerName: The name of the player
     /// - Returns: `true` if the command was sent successfully
+    @MainActor
     @discardableResult
     public static func send(_ command: Command, toPlayer playerName: String) -> Bool {
         MediaRemoteAdapterBridge.shared.sendCommand(command, toPlayer: playerName)
@@ -112,6 +113,7 @@ public enum NowPlaying {
     /// - Parameters:
     ///   - seconds: The position in seconds
     ///   - playerName: The name of the player
+    @MainActor
     public static func setPosition(_ seconds: Double, forPlayer playerName: String) {
         MediaRemoteAdapterBridge.shared.setPosition(seconds, forPlayer: playerName)
     }
@@ -120,6 +122,7 @@ public enum NowPlaying {
     /// - Parameters:
     ///   - mode: The shuffle mode
     ///   - playerName: The name of the player
+    @MainActor
     public static func setShuffle(_ mode: ShuffleMode, forPlayer playerName: String) {
         MediaRemoteAdapterBridge.shared.setShuffle(mode, forPlayer: playerName)
     }
@@ -128,6 +131,7 @@ public enum NowPlaying {
     /// - Parameters:
     ///   - mode: The repeat mode
     ///   - playerName: The name of the player
+    @MainActor
     public static func setRepeat(_ mode: RepeatMode, forPlayer playerName: String) {
         MediaRemoteAdapterBridge.shared.setRepeat(mode, forPlayer: playerName)
     }
