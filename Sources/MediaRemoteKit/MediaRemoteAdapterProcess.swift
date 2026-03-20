@@ -45,6 +45,9 @@ final class MediaRemoteAdapterProcess {
     private var isRunning = false
     private let logger = Logger(subsystem: "com.mediaremotekit", category: "adapter")
     
+    // Line buffer to accumulate incomplete JSON lines from the pipe
+    private var lineBuffer = Data()
+    
     // MARK: - Lifecycle
     
     init() {}
@@ -148,6 +151,7 @@ final class MediaRemoteAdapterProcess {
         outputPipe = nil
         updateHandler = nil
         isRunning = false
+        lineBuffer.removeAll()
         
         logger.info("MediaRemoteAdapter: stopped")
     }
@@ -155,12 +159,18 @@ final class MediaRemoteAdapterProcess {
     // MARK: - Output parsing
     
     private func parseOutput(_ data: Data) {
-        // The adapter outputs one JSON object per line
-        guard let string = String(data: data, encoding: .utf8) else { return }
+        // Append incoming data to the line buffer
+        lineBuffer.append(data)
         
-        let lines = string.components(separatedBy: .newlines)
-        for line in lines {
-            guard !line.isEmpty else { continue }
+        // Process all complete lines (terminated by newline)
+        while let newlineRange = lineBuffer.range(of: Data([0x0A])) { // 0x0A = '\n'
+            let lineData = lineBuffer.subdata(in: 0..<newlineRange.lowerBound)
+            lineBuffer.removeSubrange(0..<newlineRange.upperBound)
+            
+            guard let line = String(data: lineData, encoding: .utf8), !line.isEmpty else {
+                continue
+            }
+            
             parseJSONLine(line)
         }
     }
