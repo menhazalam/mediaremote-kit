@@ -98,13 +98,23 @@ final class MediaRemoteAdapterProcess {
         
         process.arguments = args
         
-        // Capture stdout
+        // Capture stdout and stderr
         let pipe = Pipe()
+        let errorPipe = Pipe()
         process.standardOutput = pipe
-        process.standardError = FileHandle.nullDevice
+        process.standardError = errorPipe
         
         self.process = process
         self.outputPipe = pipe
+        
+        // Log stderr on background queue
+        errorPipe.fileHandleForReading.readabilityHandler = { [weak self] handle in
+            let data = handle.availableData
+            guard !data.isEmpty else { return }
+            if let errorLog = String(data: data, encoding: .utf8) {
+                self?.logger.error("MediaRemoteAdapter (stderr): \(errorLog.trimmingCharacters(in: .whitespacesAndNewlines))")
+            }
+        }
         
         // Read stdout on background queue
         pipe.fileHandleForReading.readabilityHandler = { [weak self] handle in

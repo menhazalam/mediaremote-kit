@@ -99,15 +99,22 @@ if (!defined $ARGV[0]) {
   print_help();
 }
 
-my $framework_basename = File::Basename::basename($framework_path);
-fail "Provided path is not a framework: $framework_path"
-  unless $framework_basename =~ s/\.framework$//;
+my $framework;
+if ($framework_path =~ /\.framework$/) {
+  my $framework_basename = File::Basename::basename($framework_path);
+  $framework_basename =~ s/\.framework$//;
+  $framework = File::Spec->catfile($framework_path, $framework_basename);
+} elsif ($framework_path =~ /\.(dylib|framework\/.+)$/) {
+  $framework = $framework_path;
+} else {
+  # Try to treat as a binary if it doesn't have an extension but looks like it might be one
+  $framework = $framework_path;
+}
 
-my $framework = File::Spec->catfile($framework_path, $framework_basename);
-fail "Framework not found at $framework" unless -e $framework;
+fail "Library not found at $framework" unless -e $framework;
 
 my $handle = DynaLoader::dl_load_file($framework, 0)
-  or fail "Failed to load framework: $framework";
+  or fail "Failed to load library: $framework";
 my $function_name = shift @ARGV or fail "Missing function name";
 fail "Invalid function name: '$function_name'"
   unless $function_name eq "stream"
