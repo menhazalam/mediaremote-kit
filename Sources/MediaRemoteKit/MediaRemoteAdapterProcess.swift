@@ -64,11 +64,11 @@ final class MediaRemoteAdapterProcess {
         }
         
         // Locate bundled resources in the package bundle
-        guard let resourceURL = Bundle.module.url(forResource: "MediaRemoteAdapter", withExtension: "framework", subdirectory: "Resources") else {
+        guard let resourceURL = Bundle.module.url(forResource: "MediaRemoteAdapter", withExtension: "fwk", subdirectory: "Resources") else {
             throw NSError(
                 domain: "com.mediaremotekit",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "MediaRemoteAdapter.framework not found in package"]
+                userInfo: [NSLocalizedDescriptionKey: "MediaRemoteAdapter.fwk not found in package"]
             )
         }
         
