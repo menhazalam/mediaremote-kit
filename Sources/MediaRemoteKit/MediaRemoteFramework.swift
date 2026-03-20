@@ -24,7 +24,10 @@ final class MediaRemoteFramework {
     static let shared = MediaRemoteFramework()
     
     private typealias SendCommandFn = @convention(c) (UInt32, AnyObject?) -> DarwinBoolean
+    private typealias SetElapsedTimeFn = @convention(c) (Double) -> DarwinBoolean
+    
     private let sendCommand: SendCommandFn?
+    private let setElapsedTime: SetElapsedTimeFn?
     
     private init() {
         guard let handle = dlopen(
@@ -32,19 +35,30 @@ final class MediaRemoteFramework {
             RTLD_NOW
         ) else {
             sendCommand = nil
+            setElapsedTime = nil
             return
         }
         
-        guard let ptr = dlsym(handle, "MRMediaRemoteSendCommand") else {
+        if let ptr = dlsym(handle, "MRMediaRemoteSendCommand") {
+            sendCommand = unsafeBitCast(ptr, to: SendCommandFn.self)
+        } else {
             sendCommand = nil
-            return
         }
         
-        sendCommand = unsafeBitCast(ptr, to: SendCommandFn.self)
+        if let ptr = dlsym(handle, "MRMediaRemoteSetElapsedTime") {
+            setElapsedTime = unsafeBitCast(ptr, to: SetElapsedTimeFn.self)
+        } else {
+            setElapsedTime = nil
+        }
     }
     
     func send(_ command: MRCommand) {
         guard let fn = sendCommand else { return }
         _ = fn(UInt32(command.rawValue), nil)
+    }
+    
+    func seek(to seconds: Double) {
+        guard let fn = setElapsedTime else { return }
+        _ = fn(seconds)
     }
 }

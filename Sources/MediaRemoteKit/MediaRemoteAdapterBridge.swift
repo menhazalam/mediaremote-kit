@@ -48,20 +48,28 @@ final class MediaRemoteAdapterBridge: ObservableObject {
         adapterProcess = nil
         currentState = nil
         lastKnownBundleID = nil
+        lastKnownTitle = nil
         cleanupArtworkFile()
         isObserving = false
         logger.info("Stopped observing")
     }
     
     private var lastKnownBundleID: String?
+    private var lastKnownTitle: String?
     
     private func handleUpdate(_ update: MediaRemoteAdapterProcess.NowPlayingUpdate) {
         let previousBundleID = currentState?.bundleIdentifier
+        let previousTitle = currentState?.title
         currentState = update
         
         // Track the last known valid bundle ID
         if let bundleID = update.bundleIdentifier {
             lastKnownBundleID = bundleID
+        }
+        
+        // Clear artwork when track changes (different title)
+        if let prevTitle = previousTitle, let currTitle = update.title, prevTitle != currTitle {
+            cleanupArtworkFile()
         }
         
         // Only post playerListDidChange when switching between different valid players,
@@ -144,7 +152,7 @@ final class MediaRemoteAdapterBridge: ObservableObject {
     }
     
     func setPosition(_ seconds: Double, forPlayer playerName: String) {
-        logger.warning("setPosition not yet implemented")
+        MediaRemoteFramework.shared.seek(to: seconds)
     }
     
     func setShuffle(_ mode: NowPlaying.ShuffleMode, forPlayer playerName: String) {
