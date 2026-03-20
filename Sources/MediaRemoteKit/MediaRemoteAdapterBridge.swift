@@ -47,17 +47,26 @@ final class MediaRemoteAdapterBridge: ObservableObject {
         adapterProcess?.stop()
         adapterProcess = nil
         currentState = nil
+        lastKnownBundleID = nil
         cleanupArtworkFile()
         isObserving = false
         logger.info("Stopped observing")
     }
     
+    private var lastKnownBundleID: String?
+    
     private func handleUpdate(_ update: MediaRemoteAdapterProcess.NowPlayingUpdate) {
         let previousBundleID = currentState?.bundleIdentifier
         currentState = update
         
-        // Check if the player changed
-        if previousBundleID != update.bundleIdentifier {
+        // Track the last known valid bundle ID
+        if let bundleID = update.bundleIdentifier {
+            lastKnownBundleID = bundleID
+        }
+        
+        // Only post playerListDidChange when switching between different valid players,
+        // not when bundle ID becomes nil (which happens during transitions)
+        if let prev = previousBundleID, let curr = update.bundleIdentifier, prev != curr {
             NotificationCenter.default.post(name: .playerListDidChange, object: nil)
             NotificationCenter.default.post(name: .mrNowPlayingApplicationDidChange, object: nil)
         }
@@ -87,9 +96,10 @@ final class MediaRemoteAdapterBridge: ObservableObject {
     }
     
     func playerNames(completion: @escaping ([String]) -> Void) {
-        guard let state = currentState,
-              let bundleID = state.bundleIdentifier
-        else {
+        // Return the last known player even if nothing is currently playing
+        let bundleID = currentState?.bundleIdentifier ?? lastKnownBundleID
+        
+        guard let bundleID = bundleID else {
             completion([])
             return
         }
