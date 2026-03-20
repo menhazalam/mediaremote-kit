@@ -71,6 +71,8 @@ NowPlaying.stopObserving()
 
 This package wraps [mediaremote-adapter](https://github.com/ungive/mediaremote-adapter) by spawning `/usr/bin/perl` (which has the required entitlements) to access the private MediaRemote.framework. This bypasses the macOS 15.4+ restrictions that prevent third-party apps from reading Now Playing information.
 
+The framework is bundled as a resource (`.fwk` extension to prevent auto-linking) and loaded by the Perl script at runtime.
+
 ## Requirements
 
 - macOS 13.0+
