@@ -5,7 +5,7 @@
 //  Process manager for the mediaremote-adapter Perl script.
 //
 //  This spawns `/usr/bin/perl` with the bundled mediaremote-adapter.pl script
-//  and MediaRemoteAdapter.framework to bypass macOS 15.4+ entitlement checks.
+//  and MediaRemoteAdapter.dylib to bypass macOS 15.4+ entitlement checks.
 //
 //  The Perl script streams JSON updates to stdout in real-time, which we parse
 //  and forward to subscribers.
@@ -64,11 +64,11 @@ final class MediaRemoteAdapterProcess {
         }
         
         // Locate bundled resources in the package bundle
-        guard let resourceURL = Bundle.module.url(forResource: "MediaRemoteAdapter", withExtension: "fwk", subdirectory: "Resources") else {
+        guard let resourceURL = Bundle.module.url(forResource: "MediaRemoteAdapter", withExtension: "dylib", subdirectory: "Resources") else {
             throw NSError(
                 domain: "com.mediaremotekit",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "MediaRemoteAdapter.fwk not found in package"]
+                userInfo: [NSLocalizedDescriptionKey: "MediaRemoteAdapter.dylib not found in package"]
             )
         }
         
