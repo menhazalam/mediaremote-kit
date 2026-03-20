@@ -53,7 +53,14 @@ final class MediaRemoteAdapterBridge: ObservableObject {
     }
     
     private func handleUpdate(_ update: MediaRemoteAdapterProcess.NowPlayingUpdate) {
+        let previousBundleID = currentState?.bundleIdentifier
         currentState = update
+        
+        // Check if the player changed
+        if previousBundleID != update.bundleIdentifier {
+            NotificationCenter.default.post(name: .playerListDidChange, object: nil)
+            NotificationCenter.default.post(name: .mrNowPlayingApplicationDidChange, object: nil)
+        }
         
         if let artworkData = update.artworkData, !artworkData.isEmpty {
             saveArtworkToTempFile(artworkData, mimeType: update.artworkMimeType)

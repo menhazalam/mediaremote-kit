@@ -164,5 +164,9 @@ extension Notification.Name {
     
     /// Posted when the playing state changes (play/pause)
     public static let mrNowPlayingApplicationIsPlayingDidChange =
-        Notification.Name("kMRMediaRemoteNowPlayingApplicationIsPlayingDidChange Notification")
+        Notification.Name("kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification")
+    
+    /// Posted when a known player launches or quits
+    public static let playerListDidChange =
+        Notification.Name("com.mediaremotekit.playerListDidChange")
 }
