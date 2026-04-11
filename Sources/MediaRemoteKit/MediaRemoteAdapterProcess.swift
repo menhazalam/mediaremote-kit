@@ -97,6 +97,7 @@ final class MediaRemoteAdapterProcess {
             args.append(testClient.path)
         }
         args.append("stream")
+        args.append("--no-diff")
         args.append("--debounce=50")  // 50ms debounce to reduce update bursts
         
         process.arguments = args
