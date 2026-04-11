@@ -159,6 +159,29 @@ final class MediaRemoteAdapterProcess {
     
     // MARK: - Output parsing
     
+    /// Synchronously executes a media control command via the Perl adapter
+    static func executeCommandSync(_ args: [String]) {
+        guard let resourceURL = Bundle.module.url(forResource: "MediaRemoteAdapter", withExtension: "dylib", subdirectory: "Resources"),
+              let scriptURL = Bundle.module.url(forResource: "mediaremote-adapter", withExtension: "pl", subdirectory: "Resources") else {
+            return
+        }
+        
+        let testClientURL = Bundle.module.url(forResource: "MediaRemoteAdapterTestClient", withExtension: nil, subdirectory: "Resources")
+        
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/perl")
+        
+        var commandArgs = [scriptURL.path, resourceURL.path]
+        if let testClient = testClientURL {
+            commandArgs.append(testClient.path)
+        }
+        commandArgs.append(contentsOf: args)
+        
+        process.arguments = commandArgs
+        try? process.run()
+        process.waitUntilExit()
+    }
+    
     private func parseOutput(_ data: Data) {
         // Append incoming data to the line buffer
         lineBuffer.append(data)

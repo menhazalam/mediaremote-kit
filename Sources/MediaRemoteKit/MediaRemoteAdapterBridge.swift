@@ -152,7 +152,8 @@ final class MediaRemoteAdapterBridge: ObservableObject {
     }
     
     func setPosition(_ seconds: Double, forPlayer playerName: String) {
-        MediaRemoteFramework.shared.seek(to: seconds)
+        let micros = Int64(seconds * 1_000_000)
+        MediaRemoteAdapterProcess.executeCommandSync(["seek", "\(micros)"])
     }
     
     func setShuffle(_ mode: NowPlaying.ShuffleMode, forPlayer playerName: String) {
